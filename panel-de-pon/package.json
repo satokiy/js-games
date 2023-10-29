@@ -1,0 +1,23 @@
+{
+  "name": "panel-de-pon",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "fmt": "run-s fmt:*",
+    "fmt:eslint": "eslint --fix \"{src,tests}/*.ts\" \"{src,tests}/**/*.ts\"",
+    "fmt:prettier": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^8.52.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "bun-types": "latest"
+  },
+  "module": "index.ts"
+}
