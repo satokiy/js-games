@@ -1,4 +1,4 @@
-import { Panel, getRandomPanel } from "./panels";
+import { Panel, getRandomPanel, FALLING, FIXED } from "./panels";
 
 // パネルでポンをTypeScriptで作る
 let canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -43,6 +43,7 @@ const createPanel = (x: number, y: number, panel: Panel | 0) => {
 };
 
 const drawFieldPanels = () => {
+  ctx.clearRect(0, 0, FIELD_WIDTH, FIELD_HEIGHT);
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLUMNS; x++) {
       if (field[y][x] !== 0) createPanel(x, y, field[y][x]);
@@ -91,7 +92,6 @@ const checkMove = (x: number, y: number) => {
   return true;
 };
 document.addEventListener("keydown", (e) => {
-  ctx.clearRect(0, 0, FIELD_WIDTH, FIELD_HEIGHT);
   switch (e.key) {
     case "ArrowLeft":
       if (checkMove(cursor.x - 1, cursor.y)) cursor.x--;
@@ -120,6 +120,56 @@ document.addEventListener("keydown", (e) => {
   drawFieldPanels();
   drawCursor();
 });
+
+const updateDropState = () => {
+  // 一番下から2行目から
+  for (let y = ROWS - 2; y >= 0; y--) {
+    // 一番左から
+    for (let x = 0; x < COLUMNS; x++) {
+      let block = field[y][x];
+      if (block === 0) {
+        continue; // パネルがなければ次へ
+      } else if (block.state === FALLING) {
+        // 下にパネルがあればstateをFIXEDに
+        if (field[y + 1][x] !== 0) {
+          block.state = FIXED;
+        }
+      } else if (field[y + 1][x] === 0) {
+        // 下にパネルがなければstateをFALLINGに
+        block.state = FALLING;
+      }
+    }
+  }
+  drawFieldPanels();
+  drawCursor();
+}
+
+const dropDown = () => {
+  // 一番下から2行目から
+  for (let y = ROWS - 2; y >= 0; y--) {
+    // 一番左から
+    for (let x = 0; x < COLUMNS; x++) {
+      let block = field[y][x];
+      if (block === 0) {
+        continue; // パネルがなければ次へ
+      } else {
+        if (block.state === FALLING) {
+          // 下にパネルがなければstateをFALLINGに
+          field[y + 1][x] = block;
+          field[y][x] = 0;
+        }
+      }
+    }
+  }
+}
+
+// ゲームインターバル
+setInterval(() => {
+  updateDropState();
+  dropDown();
+  drawFieldPanels();
+  drawCursor();
+}, 1000)
 
 const init = () => {
   for (let y = 0; y < ROWS; y++) {
